@@ -14,7 +14,7 @@ signing = os.environ.get("signing")
 slack_token = os.environ.get("slack")
 
 app = Flask(__name__)
-slack_event_adapter = SlackEventAdapter(signing, '/slack/events', app)
+slack_event_adapter = SlackEventAdapter(signing, '/slack2/events', app)
 client = slack.WebClient(token = slack_token)
 
 bot_id = client.api_call("auth.test")['user_id']
