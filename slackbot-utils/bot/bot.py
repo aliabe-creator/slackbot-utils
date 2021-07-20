@@ -1,20 +1,11 @@
-'''
-Created on Jul 19, 2021
-
-@author: Private
-'''
-'''
-Created on Jul 13, 2021
-
-@author: Private
-'''
-
 import slack
 from flask import Flask, request, Response
 from slackeventsapi import SlackEventAdapter
 from dotenv import load_dotenv
 import os
-import requests, json
+import requests
+import feedparser
+import time
 
 load_dotenv()
 
@@ -73,6 +64,72 @@ def joke():
                 }
             ]
         }])
+    
+    return Response(), 200
+
+@app.route('/slack2/news', methods = ['POST'])
+def news():
+    data = request.form
+    channel_id = data.get('channel_id')
+    arg = data.get('text')
+    uid = data.get('user_id')
+    
+    sources = ['UCLA', 'DailyBruin', 'NYT']
+    
+    if (arg == None or arg not in sources):
+        client.chat_postEphemeral(user = uid, channel = channel_id, text='Please specify a valid news source. Choose from UCLA, DailyBruin, NYT.')
+    else:
+        if (arg == 'UCLA'):
+            client.chat_postEphemeral(user = uid, channel = channel_id, text='Fetching 5 most recent articles from the UCLA Newsroom...')
+            time.sleep(1)
+            
+            feed = feedparser.parse('http://newsroom.ucla.edu/rss.xml')
+            entries = feed['entries']
+            parsed = []
+            
+            for x in range(0, len(entries) - 1, 1):
+                if (entries[x].get('author') != None):
+                    parsed.append(entries[x]) #should remove any non-articles
+            
+            blocks = []
+            
+            for article in range(0, 4, 1):
+                blocks.append({
+                                "type": "divider"
+                            })
+                
+                blocks.append({
+                                "type": "section",
+                                "text": {
+                                    "type": "mrkdwn",
+                                    "text": '*' + parsed[article]['title'] + '*'
+                                },
+                                "accessory": {
+                                    "type": "button",
+                                    "text": {
+                                        "type": "plain_text",
+                                        "text": "Read the Story",
+                                        "emoji": True
+                                    },
+                                    "value": "click_me_123",
+                                    "url": parsed[article]['link'],
+                                    "action_id": "button-action",
+                                    'style': 'primary'
+                                }
+                            })
+                
+                blocks.append({
+                                "type": "context",
+                                "elements": [
+                                    {
+                                        "type": "plain_text",
+                                        "text": parsed[article]['published'] + ' | ' + parsed[article]['summary'],
+                                        "emoji": True
+                                    }
+                                ]
+                            })
+            
+            client.chat_postMessage(channel=channel_id, blocks=blocks)
     
     return Response(), 200
     

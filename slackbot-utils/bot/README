@@ -1,5 +1,5 @@
 Hey! I created this bot as a complement to slackbot-events and slackbot-socials. This bot accepts slash commands for different useful/funny commands.
 
-As of July 19, users can use /joke to get a joke.
+As of July 19, users can use /joke to get a joke, get the five most recent news articles from the UCLA Newsroom.
 
 You are free to use all or some of my code. Don't forget to create a .env file with your Slack auths.
