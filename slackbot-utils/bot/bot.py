@@ -78,7 +78,7 @@ def news():
     sources = ['UCLA', 'DailyBruin', 'dailybruin', 'db', 'NYT', 'nyt', 'BBC', 'bbc', 'latimes', 'LATimes']
     
     if (arg == None or arg not in sources):
-        client.chat_postEphemeral(user = uid, channel = channel_id, text='Please specify a valid news source. Choose from UCLA, DailyBruin, NYT.')
+        client.chat_postEphemeral(user = uid, channel = channel_id, text='Please specify a valid news source. Choose from UCLA, DailyBruin, LATimes, NYT, BBC.')
     else:
         if (arg == 'UCLA'):
             client.chat_postEphemeral(user = uid, channel = channel_id, text='Fetching 5 most recent articles from the UCLA Newsroom...')
