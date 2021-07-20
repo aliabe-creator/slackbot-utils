@@ -6,6 +6,7 @@ import os
 import requests
 import feedparser
 import time
+import re
 
 load_dotenv()
 
@@ -74,7 +75,7 @@ def news():
     arg = data.get('text')
     uid = data.get('user_id')
     
-    sources = ['UCLA', 'DailyBruin', 'NYT']
+    sources = ['UCLA', 'DailyBruin', 'dailybruin', 'db', 'NYT', 'nyt', 'BBC', 'bbc', 'latimes', 'LATimes']
     
     if (arg == None or arg not in sources):
         client.chat_postEphemeral(user = uid, channel = channel_id, text='Please specify a valid news source. Choose from UCLA, DailyBruin, NYT.')
@@ -130,7 +131,195 @@ def news():
                             })
             
             client.chat_postMessage(channel=channel_id, blocks=blocks)
-    
+        
+        if (arg == 'NYT' or arg == 'nyt'):
+            client.chat_postEphemeral(user = uid, channel = channel_id, text='Fetching NYT front page articles...')
+            time.sleep(1)
+            
+            feed = feedparser.parse('https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml')
+            entries = feed['entries']
+            
+            blocks = []
+            
+            for article in range(0, len(entries)-1, 1):
+                blocks.append({
+                                "type": "divider"
+                            })
+                
+                blocks.append({
+                                "type": "section",
+                                "text": {
+                                    "type": "mrkdwn",
+                                    "text": '*' + entries[article]['title'] + '*'
+                                },
+                                "accessory": {
+                                    "type": "button",
+                                    "text": {
+                                        "type": "plain_text",
+                                        "text": "Read the Story",
+                                        "emoji": True
+                                    },
+                                    "value": "click_me_123",
+                                    "url": entries[article]['link'],
+                                    "action_id": "button-action",
+                                    'style': 'primary'
+                                }
+                            })
+                
+                blocks.append({
+                                "type": "context",
+                                "elements": [
+                                    {
+                                        "type": "plain_text",
+                                        "text": entries[article]['published'] + ' | ' + entries[article]['summary'],
+                                        "emoji": True
+                                    }
+                                ]
+                            })
+            
+            client.chat_postMessage(channel=channel_id, blocks=blocks)
+        
+        if (arg == 'DailyBruin' or arg == 'dailybruin' or arg =='db'):
+            client.chat_postEphemeral(user = uid, channel = channel_id, text='Fetching 5 most recent DailyBruin articles...')
+            time.sleep(1)
+            
+            feed = feedparser.parse('https://rss.app/feeds/TQgBGHsMm4rpGUi1.xml')
+            entries = feed['entries']
+            
+            blocks = []
+            
+            for article in range(0, 4, 1):
+                blocks.append({
+                                "type": "divider"
+                            })
+                
+                blocks.append({
+                                "type": "section",
+                                "text": {
+                                    "type": "mrkdwn",
+                                    "text": '*' + entries[article]['title'] + '*'
+                                },
+                                "accessory": {
+                                    "type": "button",
+                                    "text": {
+                                        "type": "plain_text",
+                                        "text": "Read the Story",
+                                        "emoji": True
+                                    },
+                                    "value": "click_me_123",
+                                    "url": entries[article]['link'],
+                                    "action_id": "button-action",
+                                    'style': 'primary'
+                                }
+                            })
+                
+                blocks.append({
+                                "type": "context",
+                                "elements": [
+                                    {
+                                        "type": "plain_text",
+                                        "text": entries[article]['published'] + ' | ' + entries[article]['summary'][0:150].rsplit(' ', 1)[0] + '...',
+                                        "emoji": True
+                                    }
+                                ]
+                            })
+            
+            client.chat_postMessage(channel=channel_id, blocks=blocks)
+        
+        if (arg == 'BBC' or arg == 'bbc'):
+            client.chat_postEphemeral(user = uid, channel = channel_id, text='Fetching 5 most recent BBC - World articles...')
+            time.sleep(1)
+            
+            feed = feedparser.parse('http://feeds.bbci.co.uk/news/world/rss.xml')
+            entries = feed['entries']
+            
+            blocks = []
+            
+            for article in range(0, 4, 1):
+                blocks.append({
+                                "type": "divider"
+                            })
+                
+                blocks.append({
+                                "type": "section",
+                                "text": {
+                                    "type": "mrkdwn",
+                                    "text": '*' + entries[article]['title'] + '*'
+                                },
+                                "accessory": {
+                                    "type": "button",
+                                    "text": {
+                                        "type": "plain_text",
+                                        "text": "Read the Story",
+                                        "emoji": True
+                                    },
+                                    "value": "click_me_123",
+                                    "url": entries[article]['link'],
+                                    "action_id": "button-action",
+                                    'style': 'primary'
+                                }
+                            })
+                
+                blocks.append({
+                                "type": "context",
+                                "elements": [
+                                    {
+                                        "type": "plain_text",
+                                        "text": entries[article]['published'] + ' | ' + entries[article]['summary'],
+                                        "emoji": True
+                                    }
+                                ]
+                            })
+            
+            client.chat_postMessage(channel=channel_id, blocks=blocks)
+        
+        if (arg == 'latimes' or arg == 'LATimes'):
+            client.chat_postEphemeral(user = uid, channel = channel_id, text='Fetching 5 most recent LA Times - California articles...')
+            time.sleep(1)
+            
+            feed = feedparser.parse('https://www.latimes.com/california/rss2.0.xml')
+            entries = feed['entries']
+            
+            blocks = []
+            
+            for article in range(0, 4, 1):
+                blocks.append({
+                                "type": "divider"
+                            })
+                
+                blocks.append({
+                                "type": "section",
+                                "text": {
+                                    "type": "mrkdwn",
+                                    "text": '*' + entries[article]['title'] + '*'
+                                },
+                                "accessory": {
+                                    "type": "button",
+                                    "text": {
+                                        "type": "plain_text",
+                                        "text": "Read the Story",
+                                        "emoji": True
+                                    },
+                                    "value": "click_me_123",
+                                    "url": entries[article]['link'],
+                                    "action_id": "button-action",
+                                    'style': 'primary'
+                                }
+                            })
+                
+                blocks.append({
+                                "type": "context",
+                                "elements": [
+                                    {
+                                        "type": "plain_text",
+                                        "text": entries[article]['published'] + ' | ' + re.search('>(.*)<', entries[article]['summary']).group(1),
+                                        "emoji": True
+                                    }
+                                ]
+                            })
+            
+            client.chat_postMessage(channel=channel_id, blocks=blocks)
+                
     return Response(), 200
     
 if __name__ == "__main__":
